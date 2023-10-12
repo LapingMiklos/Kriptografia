@@ -13,20 +13,27 @@ import utils
 
 # Caesar Cipher
 
-def encrypt_caesar(plaintext):
+CAESAR_KEY: int = 3
+ALPHABET: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def encrypt_caesar(plaintext: str) -> str:
     """Encrypt plaintext using a Caesar cipher.
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    cipher: dict[str, str] = {letter: ALPHABET[(index + CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
+    return ''.join([cipher[char] if char in ALPHABET else char for char in plaintext])
 
 
-def decrypt_caesar(ciphertext):
+
+def decrypt_caesar(ciphertext: str) -> str:
     """Decrypt a ciphertext using a Caesar cipher.
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    decipher: dict[str, str] = {letter: ALPHABET[(index - CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
+    return ''.join([decipher[char] if char in ALPHABET else char for char in ciphertext])
 
 
 # Vigenere Cipher
@@ -71,6 +78,7 @@ def generate_private_key(n=8):
     """
     raise NotImplementedError  # Your implementation here
 
+
 def create_public_key(private_key):
     """Create a public key corresponding to the given private key.
 
@@ -108,6 +116,7 @@ def encrypt_mh(message, public_key):
     """
     raise NotImplementedError  # Your implementation here
 
+
 def decrypt_mh(message, private_key):
     """Decrypt an incoming message using a private key
 
@@ -127,4 +136,3 @@ def decrypt_mh(message, private_key):
     @return bytearray or str of decrypted characters
     """
     raise NotImplementedError  # Your implementation here
-
