@@ -26,7 +26,6 @@ def encrypt_caesar(plaintext: str) -> str:
     cipher: dict[str, str] = {letter: ALPHABET[(index + CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
     return ''.join([cipher.get(char, char) for char in plaintext])
 
-
 def decrypt_caesar(ciphertext: str) -> str:
     """Decrypt a ciphertext using a Caesar cipher.
 
@@ -44,9 +43,8 @@ def encrypt_vigenere(plaintext, keyword):
     """
     if len(keyword) == 0:
         raise InvalidKeyException
+    
     return ''.join([vigenere_add(char, keyword[index % len(keyword)]) for index, char in enumerate(plaintext)])
-
-print(encrypt_vigenere('ATTACKATDAWN', 'LEMON'))
 
 def decrypt_vigenere(ciphertext, keyword):
     """Decrypt ciphertext using a Vigenere cipher with a keyword.
@@ -55,18 +53,21 @@ def decrypt_vigenere(ciphertext, keyword):
     """
     if len(keyword) == 0:
         raise InvalidKeyException
+    
     return ''.join([vigenere_subtract(char, keyword[index % len(keyword)]) for index, char in enumerate(ciphertext)])
 
-print(decrypt_vigenere('LXFOPVEFRNHR', 'LEMON'))
+# Scytale cipher
 
 def encrypt_scytale(plaintext: str, circumference: int) -> str:
     if circumference < 1:
         raise InvalidKeyException
+    
     return ''.join([plaintext[start_i::circumference] for start_i in range(circumference)])
 
 def decrypt_scytale(ciphertext: str, circumference: int) -> str:
     if circumference < 1:
         raise InvalidKeyException
+    
     step = ceil(len(ciphertext) / circumference)
     extra_char_count = len(ciphertext) % circumference
     if extra_char_count == 0:
@@ -77,14 +78,59 @@ def decrypt_scytale(ciphertext: str, circumference: int) -> str:
 
     return ''.join([left[start_i::step] + right[start_i::(step - 1)] for start_i in range(step - 1)]) + left[step - 1::step]
 
-asd = encrypt_scytale('0123456789012', 5)
-print(asd)
-print(decrypt_scytale(asd, 5))
+# Railfence cipher
 
-"""
-0    5    0
- 1    6
-  2    7
-   3    8
-    4    9
-"""
+def encrypt_railfence(plaintext: str, num_rails: int) -> str:
+    if num_rails < 1:
+        raise InvalidKeyException
+    
+    rails = ['' for _ in range(num_rails)]
+    current_rail = 0
+    inc = 1
+    for char in plaintext:
+        rails[current_rail] += char
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    return ''.join(rails)
+
+def decrypt_railfence(ciphertext: str, num_rails: int) -> str:
+    if num_rails < 1:
+        raise InvalidKeyException
+    
+    char_counts = [0 for _ in range(num_rails)]
+    current_rail = 0
+    inc = 1
+    for _ in ciphertext:
+        char_counts[current_rail] += 1
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    
+    rails: list[list[int]] = []
+    sum = 0
+    for char_count in char_counts:
+        prev_sum = sum
+        sum += char_count
+        rails.append(list(range(prev_sum, sum)))
+
+    plaintext = ''
+    current_rail = 0
+    inc = 1
+    for _ in ciphertext:
+        plaintext += ciphertext[rails[current_rail].pop(0)]
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    
+    return plaintext
+
+asd = encrypt_railfence('WEAREDISCOVEREDFLEEATONCE', 3)
+print(asd)
+print(decrypt_railfence(asd, 3))
