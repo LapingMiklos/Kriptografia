@@ -9,7 +9,7 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
-import utils
+from utils import vigenere_add, vigenere_subtract
 
 # Caesar Cipher
 
@@ -41,16 +41,18 @@ def encrypt_vigenere(plaintext, keyword):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    return ''.join([vigenere_add(char, keyword[index % len(keyword)]) for index, char in enumerate(plaintext)])
 
+print(encrypt_vigenere('ATTACKATDAWN', 'LEMON'))
 
 def decrypt_vigenere(ciphertext, keyword):
     """Decrypt ciphertext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    return ''.join([vigenere_subtract(char, keyword[index % len(keyword)]) for index, char in enumerate(ciphertext)])
 
+print(decrypt_vigenere('LXFOPVEFRNHR', 'LEMON'))
 
 # Merkle-Hellman Knapsack Cryptosystem
 

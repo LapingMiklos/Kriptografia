@@ -4,8 +4,25 @@ Mathematical utilities for CS41's Assignment 1: Cryptography.
 """
 import fractions as _fractions
 
+def vigenere_add(a: str, b: str) -> str:
+    if a < 'A' or a > 'Z' or b < 'A' or b > 'Z':
+        raise InvalidCharException
+    return chr((ord(a) + ord(b) - 2 * ord('A')) % 26 + ord('A'))
+
+def vigenere_subtract(a: str, b: str) -> str:
+    if a < 'A' or a > 'Z' or b < 'A' or b > 'Z':
+        raise InvalidCharException
+    return chr((ord(a) - ord(b)) % 26 + ord('A'))
+
 class Error(Exception):
     """Base class for exceptions in this module."""
+
+
+class InvalidCharException(Error):
+    pass
+
+class InvalidKeyException(Error):
+    pass
 
 class BinaryConversionError(Error):
     """Custom exception for invalid binary conversions."""
@@ -19,7 +36,6 @@ def is_superincreasing(seq):
             return False
         ct += n
     return True
-
 
 def modinv(a, b):
     """Returns the modular inverse of a mod b.
