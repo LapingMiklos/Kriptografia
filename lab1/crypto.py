@@ -23,8 +23,7 @@ def encrypt_caesar(plaintext: str) -> str:
     Add more implementation details here.
     """
     cipher: dict[str, str] = {letter: ALPHABET[(index + CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
-    return ''.join([cipher[char] if char in ALPHABET else char for char in plaintext])
-
+    return ''.join([cipher.get(char, char) for char in plaintext])
 
 
 def decrypt_caesar(ciphertext: str) -> str:
@@ -33,8 +32,7 @@ def decrypt_caesar(ciphertext: str) -> str:
     Add more implementation details here.
     """
     decipher: dict[str, str] = {letter: ALPHABET[(index - CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
-    return ''.join([decipher[char] if char in ALPHABET else char for char in ciphertext])
-
+    return ''.join([decipher.get(char, char) for char in ciphertext])
 
 # Vigenere Cipher
 
