@@ -9,7 +9,7 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
-from utils import vigenere_add, vigenere_subtract
+from utils import vigenere_add, vigenere_subtract, InvalidKeyException
 
 # Caesar Cipher
 
@@ -41,6 +41,8 @@ def encrypt_vigenere(plaintext, keyword):
 
     Add more implementation details here.
     """
+    if len(keyword) == 0:
+        raise InvalidKeyException
     return ''.join([vigenere_add(char, keyword[index % len(keyword)]) for index, char in enumerate(plaintext)])
 
 print(encrypt_vigenere('ATTACKATDAWN', 'LEMON'))
@@ -50,6 +52,8 @@ def decrypt_vigenere(ciphertext, keyword):
 
     Add more implementation details here.
     """
+    if len(keyword) == 0:
+        raise InvalidKeyException
     return ''.join([vigenere_subtract(char, keyword[index % len(keyword)]) for index, char in enumerate(ciphertext)])
 
 print(decrypt_vigenere('LXFOPVEFRNHR', 'LEMON'))
