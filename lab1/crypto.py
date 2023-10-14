@@ -130,7 +130,3 @@ def decrypt_railfence(ciphertext: str, num_rails: int) -> str:
             inc = -1
     
     return plaintext
-
-asd = encrypt_railfence('WEAREDISCOVEREDFLEEATONCE', 3)
-print(asd)
-print(decrypt_railfence(asd, 3))
