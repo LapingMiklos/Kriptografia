@@ -96,10 +96,30 @@ def decrypt_scytale(ciphertext: str, circumference: int) -> str:
 
     return ''.join([left[start_i::step] + right[start_i::(step - 1)] for start_i in range(step - 1)]) + left[step - 1::step]
 
+def encrypt_bytes_scytale(plaintext: bytes, circumference: int) -> bytes:
+    if circumference < 1:
+        raise InvalidKeyException
+    
+    return b''.join([plaintext[start_i::circumference] for start_i in range(circumference)])
+
+def decrypt_bytes_scytale(ciphertext: bytes, circumference: int) -> bytes:
+    if circumference < 1:
+        raise InvalidKeyException
+    
+    step = ceil(len(ciphertext) / circumference)
+    extra_char_count = len(ciphertext) % circumference
+    if extra_char_count == 0:
+        return b''.join([ciphertext[start_i::step] for start_i in range(step)])
+    
+    step_len_separation = step * extra_char_count
+    left, right = ciphertext[:step_len_separation], ciphertext[step_len_separation:]
+
+    return b''.join([left[start_i::step] + right[start_i::(step - 1)] for start_i in range(step - 1)]) + left[step - 1::step]
+
 # Railfence cipher
 
 def encrypt_railfence(plaintext: str, num_rails: int) -> str:
-    if num_rails < 1:
+    if num_rails <= 1:
         raise InvalidKeyException
     
     rails = ['' for _ in range(num_rails)]
@@ -115,7 +135,7 @@ def encrypt_railfence(plaintext: str, num_rails: int) -> str:
     return ''.join(rails)
 
 def decrypt_railfence(ciphertext: str, num_rails: int) -> str:
-    if num_rails < 1:
+    if num_rails <= 1:
         raise InvalidKeyException
     
     char_counts = [0 for _ in range(num_rails)]
@@ -129,18 +149,19 @@ def decrypt_railfence(ciphertext: str, num_rails: int) -> str:
         elif current_rail == num_rails - 1:
             inc = -1
     
-    rails: list[list[int]] = []
+    rails: list[int] = []
     sum = 0
     for char_count in char_counts:
         prev_sum = sum
         sum += char_count
-        rails.append(list(range(prev_sum, sum)))
+        rails.append(prev_sum)
 
     plaintext = ''
     current_rail = 0
     inc = 1
     for _ in ciphertext:
-        plaintext += ciphertext[rails[current_rail].pop(0)]
+        plaintext += ciphertext[rails[current_rail]]
+        rails[current_rail] += 1
         current_rail += inc
         if current_rail == 0:
             inc = 1
@@ -148,3 +169,56 @@ def decrypt_railfence(ciphertext: str, num_rails: int) -> str:
             inc = -1
     
     return plaintext
+
+def encrypt_bytes_railfence(plainbytes: bytes, num_rails: int) -> bytes:
+    if num_rails <= 1:
+        raise InvalidKeyException
+    
+    rails = [b'' for _ in range(num_rails)]
+    current_rail = 0
+    inc = 1
+    for byte in plainbytes:
+        rails[current_rail] += byte.to_bytes(length=1, byteorder='big')
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    return b''.join(rails)
+
+def decrypt_bytes_railfence(cipherbytes: bytes, num_rails: int) -> bytes:
+    if num_rails <= 1:
+        raise InvalidKeyException
+    
+    char_counts = [0 for _ in range(num_rails)]
+    current_rail = 0
+    inc = 1
+    for _ in cipherbytes:
+        char_counts[current_rail] += 1
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    
+    rails: list[int] = []
+    sum = 0
+    for char_count in char_counts:
+        prev_sum = sum
+        sum += char_count
+        rails.append(prev_sum)
+
+    plainbytes = b''
+    current_rail = 0
+    inc = 1
+
+    for _ in cipherbytes:
+        plainbytes += cipherbytes[rails[current_rail]].to_bytes(length=1, byteorder='big')
+        rails[current_rail] += 1
+        current_rail += inc
+        if current_rail == 0:
+            inc = 1
+        elif current_rail == num_rails - 1:
+            inc = -1
+    
+    return plainbytes
