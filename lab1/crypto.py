@@ -9,7 +9,7 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
-from utils import vigenere_add, vigenere_subtract, InvalidKeyException
+from utils import vigenere_add, vigenere_subtract, vigenere_add_bytes, vigenere_subtract_bytes, InvalidKeyException
 from math import ceil
 
 # Caesar Cipher
@@ -34,9 +34,15 @@ def decrypt_caesar(ciphertext: str) -> str:
     decipher: dict[str, str] = {letter: ALPHABET[(index - CAESAR_KEY) % len(ALPHABET)] for index, letter in enumerate(ALPHABET)}
     return ''.join([decipher.get(char, char) for char in ciphertext])
 
+def encrypt_bytes_caesar(plainbytes: bytes) -> bytes:
+    return bytes([(byte + CAESAR_KEY) % 256 for byte in plainbytes])
+
+def decrypt_bytes_caesar(cipherbytes: bytes) -> bytes:
+    return bytes([(byte - CAESAR_KEY) % 256 for byte in cipherbytes])
+
 # Vigenere Cipher
 
-def encrypt_vigenere(plaintext, keyword):
+def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     """Encrypt plaintext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
@@ -46,7 +52,7 @@ def encrypt_vigenere(plaintext, keyword):
     
     return ''.join([vigenere_add(char, keyword[index % len(keyword)]) for index, char in enumerate(plaintext)])
 
-def decrypt_vigenere(ciphertext, keyword):
+def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     """Decrypt ciphertext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
@@ -55,6 +61,18 @@ def decrypt_vigenere(ciphertext, keyword):
         raise InvalidKeyException
     
     return ''.join([vigenere_subtract(char, keyword[index % len(keyword)]) for index, char in enumerate(ciphertext)])
+
+def encrypt_bytes_vigenere(plainbytes: bytes, keyword: bytes) -> bytes:
+    if len(keyword) == 0:
+        raise InvalidKeyException
+    
+    return bytes([vigenere_add_bytes(byte, keyword[index % len(keyword)]) for index, byte in enumerate(plainbytes)])
+
+def decrypt_bytes_vigenere(cipherbytes: bytes, keyword: bytes) -> bytes:
+    if len(keyword) == 0:
+        raise InvalidKeyException
+    
+    return bytes([vigenere_subtract_bytes(byte, keyword[index % len(keyword)]) for index, byte in enumerate(cipherbytes)])
 
 # Scytale cipher
 

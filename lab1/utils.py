@@ -14,11 +14,24 @@ def vigenere_subtract(a: str, b: str) -> str:
         raise InvalidCharException
     return chr((ord(a) - ord(b)) % 26 + ord('A'))
 
+def vigenere_add_bytes(x: int, y: int) -> int:
+    if x < 0 or x > 255 or y < 0 or y > 255:
+        raise InvalidByteException
+    return (x + y) % 256
+
+def vigenere_subtract_bytes(x: int, y: int) -> int:
+    if x < 0 or x > 255 or y < 0 or y > 255:
+        raise InvalidByteException
+    return (x - y) % 256
+
 class Error(Exception):
     """Base class for exceptions in this module."""
 
 
 class InvalidCharException(Error):
+    pass
+
+class InvalidByteException(Error):
     pass
 
 class InvalidKeyException(Error):
