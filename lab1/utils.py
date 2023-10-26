@@ -3,6 +3,7 @@
 Mathematical utilities for CS41's Assignment 1: Cryptography.
 """
 import fractions as _fractions
+from typing import Callable
 
 def vigenere_add(a: str, b: str) -> str:
     if a < 'A' or a > 'Z' or b < 'A' or b > 'Z':
@@ -23,6 +24,13 @@ def vigenere_subtract_bytes(x: int, y: int) -> int:
     if x < 0 or x > 255 or y < 0 or y > 255:
         raise InvalidByteException
     return (x - y) % 256
+
+def test_method(plaintext: str, encryption_method: Callable[[str], str], decryption_method: Callable[[str], str], method_name: str):
+    print(f'Method: {method_name}')
+    print(f'Plaintext: {plaintext}')
+    encrypted_text = encryption_method(plaintext)
+    print(f'Encrypted: {encrypted_text}')
+    print(f'Decrypted: {decryption_method(encrypted_text)}')
 
 class Error(Exception):
     """Base class for exceptions in this module."""

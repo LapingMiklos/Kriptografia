@@ -9,8 +9,9 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
-from utils import vigenere_add, vigenere_subtract, vigenere_add_bytes, vigenere_subtract_bytes, InvalidKeyException
+from utils import vigenere_add, vigenere_subtract, vigenere_add_bytes, vigenere_subtract_bytes, test_method, InvalidKeyException
 from math import ceil
+from typing import Callable
 
 # Caesar Cipher
 
@@ -222,3 +223,22 @@ def decrypt_bytes_railfence(cipherbytes: bytes, num_rails: int) -> bytes:
             inc = -1
     
     return plainbytes
+
+# Non-txt file encryption
+
+def transform_file(i_file_path: str, o_file_path: str, method: Callable[[bytes], bytes]) -> None:
+    with open(i_file_path, 'rb') as i_file:
+        plainbytes = i_file.read()
+        encrypted_bytes = method(plainbytes)
+        with open(o_file_path, 'wb') as o_file:
+            o_file.write(encrypted_bytes)
+
+
+if __name__ == '__main__':
+    test_method("PYTHONSOMETHING", encrypt_caesar, decrypt_caesar, 'Caesar')
+    test_method("PYTHONSOMETHING", lambda text: encrypt_vigenere(text, "COBRA"), lambda text: decrypt_vigenere(text, "COBRA"), "Vigenere")
+    test_method("PYTHONSOMETHING", lambda text: encrypt_scytale(text, 5), lambda text: decrypt_scytale(text, 5), "Scytale")
+    test_method("PYTHONSOMETHING", lambda text: encrypt_railfence(text, 5), lambda text: decrypt_railfence(text, 5), "Railfence")
+
+    transform_file('res/tux.png', 'out/encrypted_tux.png', lambda bytes: encrypt_bytes_railfence(bytes, 5))
+    transform_file('out/encrypted_tux.png', 'out/decrypted_tux.png', lambda bytes: decrypt_bytes_railfence(bytes, 5))
