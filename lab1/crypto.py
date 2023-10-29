@@ -240,5 +240,5 @@ if __name__ == '__main__':
     test_method("PYTHONSOMETHING", lambda text: encrypt_scytale(text, 5), lambda text: decrypt_scytale(text, 5), "Scytale")
     test_method("PYTHONSOMETHING", lambda text: encrypt_railfence(text, 5), lambda text: decrypt_railfence(text, 5), "Railfence")
 
-    transform_file('res/tux.png', 'out/encrypted_tux.png', lambda bytes: encrypt_bytes_railfence(bytes, 5))
-    transform_file('out/encrypted_tux.png', 'out/decrypted_tux.png', lambda bytes: decrypt_bytes_railfence(bytes, 5))
+    transform_file('Tux.png', 'encrypted_tux.png', lambda bytes: encrypt_bytes_caesar(bytes))
+    transform_file('encrypted_tux.png', 'decrypted_tux.png', lambda bytes: decrypt_bytes_caesar(bytes))

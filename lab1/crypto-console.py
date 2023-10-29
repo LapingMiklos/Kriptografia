@@ -10,9 +10,13 @@ If you are a student, you shouldn't need to change anything in this file.
 import random
 
 from crypto import (encrypt_caesar, decrypt_caesar,
+                    encrypt_bytes_caesar, decrypt_bytes_caesar,
                     encrypt_vigenere, decrypt_vigenere,
+                    encrypt_bytes_vigenere, decrypt_bytes_vigenere,
                     encrypt_scytale, decrypt_scytale,
-                    encrypt_railfence, decrypt_railfence)
+                    encrypt_bytes_scytale, decrypt_bytes_scytale,
+                    encrypt_railfence, decrypt_railfence,
+                    encrypt_bytes_railfence, decrypt_bytes_railfence)
 
 from utils import InvalidCharException
 
@@ -115,27 +119,47 @@ def clean_caesar(text):
 def clean_vigenere(text):
     return ''.join(ch for ch in text.upper() if ch.isupper())
 
+def is_valid(data: str):
+    return all([ch.isupper() for ch in data])
+
 
 def run_caesar():
     action = get_action()
     encrypting = action == 'E'
-    data = clean_caesar(get_input(binary=False))
+    binary = get_yes_or_no('Binary?')
+    while True:
+        data = get_input(binary)
+        if binary or is_valid(data):
+            break
+        print("Input was invalid")
 
     print("* Transform *")
     print("{}crypting {} using Caesar cipher...".format('En' if encrypting else 'De', data))
 
-    output = (encrypt_caesar if encrypting else decrypt_caesar)(data)
+    if binary:
+        output = (encrypt_bytes_caesar if encrypting else decrypt_bytes_caesar)(data)
+    else:
+        output = (encrypt_caesar if encrypting else decrypt_caesar)(data)
 
-    set_output(output)
+    set_output(output, binary)
 
 
 def run_vigenere():
     action = get_action()
     encrypting = action == 'E'
-    data = clean_vigenere(get_input(binary=False))
 
-    print("* Transform *")
-    keyword = clean_vigenere(input("Keyword? "))
+    while True:
+        data = get_input(binary=False)
+        if is_valid(data):
+            break
+        print("Input was invalid")
+
+    print("* Keyword *")
+    while True:
+        keyword = get_input(binary=False)
+        if is_valid(keyword):
+            break
+        print("Input was invalid")
 
     print("{}crypting {} using Vigenere cipher and keyword {}...".format('En' if encrypting else 'De', data, keyword))
 
