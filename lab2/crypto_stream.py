@@ -1,14 +1,44 @@
-from typing import Callable, Iterable, Iterator
-
+from typing import Callable, Iterator
+from solitaire import solitaire
 type StreamGenerator[T] = Callable[[T], Iterator[int]]
 
-def stream_encryption[T](data: Iterable[int], seed: T, stream_generator: StreamGenerator[T]) -> Iterator[int]:
-    for p, k in zip(data, stream_generator(seed)):
-        yield p ^ k
+class StreamEncrypter[T]:
+    def __init__(self, seed: T, generator: StreamGenerator[T]):
+        self.stream = generator(seed)
 
-with open("asd.txt", "rb") as f:
-    seed = 10
-    encrypted = stream_encryption(f.read(), seed, lambda x: range(100))
+    def __call__(self, data: bytes) -> bytes:
+        e = bytearray()
+        for p, k in zip(data, self.stream):
+            e.append(p ^ k)
+        return bytes(e)
 
-    decrypted = stream_encryption(encrypted, seed, lambda x: range(100))
-    print(bytes(decrypted))
+seed = [x + 1 for x in range(54)]
+stream = solitaire(seed)
+
+
+bytes_list = []
+hist = [0 for _ in range(256)]
+i = 0
+for byte in stream:
+    # print(byte)
+    hist[byte] += 1
+    bytes_list.append(byte)
+    i += 1
+    if i > 10000:
+        break
+
+print(sum(bytes_list) / len(bytes_list))
+print(min(hist), max(hist))
+print(hist)
+
+message = bytes(input("What do you wanna encrytp? "), encoding='utf8')
+
+encrypter = StreamEncrypter(seed, solitaire)
+decrypter = StreamEncrypter(seed, solitaire)
+
+e = bytes(encrypter(message))
+# e = bytes(encrypter.transform(message))
+print(e)
+d = bytes(decrypter(e))
+# d = bytes(decrypter.transform(e))
+print(d)
