@@ -1,4 +1,5 @@
 from typing import Iterator
+from math import gcd
 
 class InvalidSeedException(Exception):
     pass
@@ -15,8 +16,9 @@ def solitaire(deck: list[int]) -> Iterator[int]:
         raise InvalidSeedException
 
     while True:
-        byte = []
-        while len(byte) < 8:
+        byte = 0
+        f = 1
+        while f < 2 ** 8:
             # joker find and push
             a_i = deck.index(JOKER_A)
 
@@ -51,16 +53,25 @@ def solitaire(deck: list[int]) -> Iterator[int]:
             output = deck[top_val] % 4
             
 
-            byte += [output % 2, output // 2 % 2]
+            byte = byte | ((output % 2) * f) | ((output // 2 % 2) * f * 2)
+            f *= 4
+        yield byte
+
+
+M = 1204334797 * 9022686991
+
+def blum_blum_shub(seed: int) -> Iterator[int]:
+    if gcd(seed, M) != 1:
+        raise InvalidSeedException
+    
+    x = seed
+    while True:
+        byte = 0
+        f = 1
+        for _ in range(8):
+            x = x ** 2 % M
+            byte = byte | ((x % 2) * f)
+            f *= 2
         
-        yield sum([bit * (2 ** i) for i, bit in enumerate(byte)])
+        yield byte
 
-
-
-
-
-
-
-
-        
-        
