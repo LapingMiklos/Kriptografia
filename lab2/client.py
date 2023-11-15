@@ -7,11 +7,16 @@ from generators import solitaire, blum_blum_shub
 
 HOST = 'localhost'
 
+method = solitaire
+seed = [x + 1 for x in range(54)]
+encrypter = StreamEncrypter(seed, method)
+
 def recv(server_socket: socket):
     recv_socket, address = server_socket.accept()
     print(address)
     while True:
-        data = recv_socket.recv(1024).decode()
+        e = recv_socket.recv(1024)
+        data = encrypter(e).decode()
         if data == 'EXIT':
             exit()
         print(data)
@@ -33,7 +38,7 @@ if __name__ == "__main__":
         while True:
             data = input("Send something: ")
 
-            send_socket.send(data.encode())
+            send_socket.send(encrypter(data.encode()))
 
             if data == "EXIT":
                 break
