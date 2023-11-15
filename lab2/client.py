@@ -16,6 +16,7 @@ def recv(server_socket: socket, decrypter: StreamEncrypter):
         e = recv_socket.recv(1024)
         data = decrypter(e).decode()
         if data == EXIT:
+            recv_socket.close()
             break
         print("\nReceived: ", data)
         print("> ", end="", flush=True)
