@@ -11,15 +11,14 @@ EXIT = 'bye'
 CONFIG = "config2.json"
 
 def recv(server_socket: socket, decrypter: StreamEncrypter):
-    recv_socket, _ = server_socket.accept()
-    while True:
-        e = recv_socket.recv(1024)
-        data = decrypter(e).decode()
-        if data == EXIT:
-            recv_socket.close()
-            break
-        print("\nReceived: ", data)
-        print("> ", end="", flush=True)
+    with server_socket.accept()[0] as recv_socket:
+        while True:
+            e = recv_socket.recv(1024)
+            data = decrypter(e).decode()
+            if data == EXIT or data == '':
+                break
+            print("\nReceived: ", data)
+            print("> ", end="", flush=True)
         
 
 
