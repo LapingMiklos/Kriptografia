@@ -3,6 +3,8 @@ from generators import solitaire, blum_blum_shub
 
 type StreamGenerator[T] = Callable[[T], Iterator[int]]
 
+DECK = [36, 47, 48, 49, 50, 51, 37, 38, 42, 43, 44, 45, 46, 52, 53, 26, 40, 41, 5, 6, 7, 8, 9, 10, 54, 1, 2, 3, 4, 39, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 11, 12, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+
 def test_generator[T](seed: T, generator: StreamGenerator[T], method_name: str, iterations: int = 100000):
     print(f"Testing rng {method_name}: ")
     stream = generator(seed)
@@ -35,4 +37,4 @@ class StreamEncrypter[T]:
 
 if __name__ == '__main__':
     test_generator(2, blum_blum_shub, "Blum Blum Shub")
-    test_generator([x + 1 for x in range(54)], solitaire, "Solitaire")
+    test_generator(DECK, solitaire, "Solitaire")

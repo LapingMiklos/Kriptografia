@@ -12,7 +12,8 @@ def solitaire(deck: list[int]) -> Iterator[int]:
     if len(deck) != DECK_LEN:
         raise InvalidSeedException
     
-    if any([card < 1 or card > DECK_LEN for card in deck]):
+    cards = [x + 1 for x in range(54)]
+    if any([card not in deck for card in cards]):
         raise InvalidSeedException
 
     while True:
@@ -38,21 +39,20 @@ def solitaire(deck: list[int]) -> Iterator[int]:
             # triple cut
             a_i = deck.index(JOKER_A)
             b_i = deck.index(JOKER_B)
-            first, second = a_i, b_i # if a_i < b_i else b_i, a_i
+            first, second = a_i, b_i
             if a_i > b_i:
                 first, second = b_i, a_i
             deck = deck[second + 1:] + deck[first:second + 1] + deck[:first]
+
             # count cut
             bottom_val = min(53, deck[-1])
             deck = deck[bottom_val:-1] + deck[:bottom_val] + deck[-1:]
-
 
             top_val = min(53, deck[0])
             if deck[top_val] == JOKER_A or deck[top_val] == JOKER_B:
                 continue
             output = deck[top_val] % 4
             
-
             byte = byte | ((output % 2) * f) | ((output // 2 % 2) * f * 2)
             f *= 4
         yield byte
