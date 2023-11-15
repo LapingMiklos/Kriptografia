@@ -33,5 +33,6 @@ class StreamEncrypter[T]:
             e.append(p ^ k)
         return bytes(e)
 
-test_generator(2, blum_blum_shub, "Blum Blum Shub")
-test_generator([x + 1 for x in range(54)], solitaire, "Solitaire")
+if __name__ == '__main__':
+    test_generator(2, blum_blum_shub, "Blum Blum Shub")
+    test_generator([x + 1 for x in range(54)], solitaire, "Solitaire")
