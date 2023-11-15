@@ -27,11 +27,11 @@ class StreamEncrypter[T]:
     def __init__(self, seed: T, generator: StreamGenerator[T]):
         self.stream = generator(seed)
 
-    def __call__(self, data: bytes) -> bytes:
+    def __call__(self, data: bytes) -> bytearray:
         e = bytearray()
         for p, k in zip(data, self.stream):
             e.append(p ^ k)
-        return bytes(e)
+        return e
 
 if __name__ == '__main__':
     test_generator(2, blum_blum_shub, "Blum Blum Shub")
