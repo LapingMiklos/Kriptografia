@@ -10,6 +10,9 @@ HOST = 'localhost'
 EXIT = 'bye'
 CONFIG = "config2.json"
 
+PORT_CHOSEN = False
+EXITED = False
+
 def recv(server_socket: socket, decrypter: StreamEncrypter):
     with server_socket.accept()[0] as recv_socket:
         while True:
@@ -18,7 +21,9 @@ def recv(server_socket: socket, decrypter: StreamEncrypter):
             if data == EXIT or data == '':
                 break
             print("\nReceived: ", data)
-            print("> ", end="", flush=True)
+            
+            if not EXITED:
+                print("> " if PORT_CHOSEN else "Peer port? ", end="", flush=True)
         
 
 
@@ -39,13 +44,14 @@ if __name__ == "__main__":
 
         peer_port = int(input("Peer port? "))
         send_socket.connect((HOST, peer_port))
-        
+        PORT_CHOSEN = True
         while True:
             data = input("> ")
 
             send_socket.send(encrypter(data.encode()))
 
             if data == EXIT:
+                EXITED = True
                 break
 
         t1.join()
