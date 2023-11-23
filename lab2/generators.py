@@ -66,7 +66,7 @@ def solitaire(deck: Deck) -> Iterator[int]:
                 continue
             output = deck[top_val] % 4
             
-            byte = byte | ((output % 2) << i) | ((output // 2 % 2) << (i + 1))
+            byte = byte | (output << i)
             i += 2
         yield byte
 
