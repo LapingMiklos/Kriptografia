@@ -1,8 +1,7 @@
-from typing import Any
 from socket import socket, AF_INET, SOCK_STREAM
 import json
 
-from constants import HOST, KEYSERVER_PORT, REGISTER, REQUIRE, GET, SET, OK, NOT_OK
+from constants import HOST, KEYSERVER_PORT, GET, SET, OK, NOT_OK
 
 def resolve_query(client_socket: socket, public_keys: dict):
     def send_error(**kwargs: dict):
@@ -26,6 +25,7 @@ def resolve_query(client_socket: socket, public_keys: dict):
             else:
                 public_keys[client_id] = public_key
                 send_ok()
+                print(f'New public_key={public_key} for client with id={client_id}')
         elif method == GET:
             client_id = query.get('clientId')
             if client_id is None:
@@ -42,6 +42,7 @@ def resolve_query(client_socket: socket, public_keys: dict):
     except json.JSONDecodeError:
         send_error(msg='Invalid query format')
 
+
 def main():
     with socket(AF_INET, SOCK_STREAM) as server_socket:
         server_socket.bind((HOST, KEYSERVER_PORT))
@@ -52,7 +53,7 @@ def main():
         while True:
             with server_socket.accept()[0] as client_socket:
                 resolve_query(client_socket, public_keys)
-                print(public_keys)
+
                 
 
 if __name__ == '__main__':
