@@ -2,7 +2,8 @@ from random import randint, seed
 from time import time
 from utils import coprime, byte_to_bits, bits_to_byte, modinv
 
-type PrivateKey = tuple[tuple, int, int]
+type PrivateKey = tuple[tuple[int], int, int]
+type PublicKey = tuple[int]
 
 def generate_private_key(n: int=8) -> PrivateKey:
     """Generate a private key for use in the Merkle-Hellman Knapsack Cryptosystem.
@@ -41,7 +42,8 @@ def generate_private_key(n: int=8) -> PrivateKey:
 
     return tuple(w), q, r
 
-def create_public_key(private_key: PrivateKey) -> tuple:
+
+def create_public_key(private_key: PrivateKey) -> PublicKey:
     """Create a public key corresponding to the given private key.
 
     To accomplish this, you only need to build and return `beta` as described in the handout.
@@ -59,7 +61,7 @@ def create_public_key(private_key: PrivateKey) -> tuple:
     return tuple(r * w_i % q for w_i in w)
 
 
-def encrypt_mh(message: bytes, public_key: tuple) -> list[int]:
+def encrypt_mh(message: bytes, public_key: PublicKey) -> list[int]:
     """Encrypt an outgoing message using a public key.
 
     1. Separate the message into chunks the size of the public key (in our case, fixed at 8)
@@ -84,7 +86,7 @@ def encrypt_mh(message: bytes, public_key: tuple) -> list[int]:
     ]
 
 
-def decrypt_mh(message: list[int], private_key) -> bytes:
+def decrypt_mh(message: list[int], private_key: PrivateKey) -> bytes:
     """Decrypt an incoming message using a private key
 
     1. Extract w, q, and r from the private key
@@ -119,3 +121,7 @@ def decrypt_mh(message: list[int], private_key) -> bytes:
         return bits_to_byte(bits)
 
     return bytes(decrypt(c_i) for c_i in c)
+
+def generate_knapsack_keypair() -> tuple[PrivateKey, PublicKey]:
+    private_key = generate_private_key()
+    return private_key, create_public_key(private_key)
