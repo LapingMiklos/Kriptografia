@@ -15,6 +15,7 @@ if __name__ == '__main__':
                 tokens = msg.split(':')
                 if len(tokens) != 2:
                     client_socket.send(b'Incorrect query')
+                    print('Incorrect')
                     continue
 
                 query, data = tokens
@@ -22,9 +23,11 @@ if __name__ == '__main__':
                     tokens = data.split()
                     if len(tokens) != 2:
                         client_socket.send(b'Incorrect query')
+                        print('Incorrect 2')
                     else:
                         client_id, public_key = tokens
                         public_keys[client_id] = public_key
+                        print('New keys', public_keys)
                 elif query == REQUIRE:
-                    client_socket.send(public_keys.get(data, 'Key not found'))
+                    client_socket.send(public_keys.get(data, 'Key not found').encode())
 
