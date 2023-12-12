@@ -43,7 +43,7 @@ def receive(socket: socket, decrypter: PrivateKeyDecrypter) -> Any:
     e = json.loads(socket.recv(2048))
     return json.loads(decrypter(e))
 
-def recv(server_socket: socket):
+def recv_thread(server_socket: socket):
     global peer_client_id
     global mh_encrypter
     global HANDSHAKE_STARTED
@@ -52,8 +52,6 @@ def recv(server_socket: socket):
     with server_socket.accept()[0] as recv_socket:
         if not HANDSHAKE_STARTED:
             HANDSHAKE_STARTED = True
-            # hello: list[int] = json.loads(recv_socket.recv(1024))
-            # msg: dict = json.loads(mh_decrypter(hello))
             hello: dict = receive(recv_socket, mh_decrypter)
             peer_client_id = hello['clientId']
             print('\nPeer client id =', peer_client_id)
@@ -62,19 +60,13 @@ def recv(server_socket: socket):
             mh_encrypter = PublicKeyEncrypter(peer_public_key, encrypt_mh)
 
             send(recv_socket, mh_encrypter, {'msg': 'Ack'})
-            # e = mh_encrypter(json.dumps({'msg': 'Ack'}).encode())
-            # recv_socket.send(json.dumps(e).encode())
 
             my_solitaire_key = generate_solitaire_key()
 
-            # e: list[int] = json.loads(recv_socket.recv(2048))
-            # their_solitaire_key: dict = json.loads(mh_decrypter(e))
             their_solitaire_key = receive(recv_socket, mh_decrypter)
             print('Peer solitaire key', their_solitaire_key)
 
             send(recv_socket, mh_encrypter, my_solitaire_key)
-            # e = mh_encrypter(json.dumps(my_solitaire_key).encode())
-            # recv_socket.send(json.dumps(e).encode())
 
             common_solitaire_key = combine_solitaire_keys(my_solitaire_key, their_solitaire_key)
             print('Common solitaire key', common_solitaire_key)
@@ -137,22 +129,14 @@ def init_handshake(socket: socket, client_id: int):
 
     HANDSHAKE_STARTED = True
     send(socket, mh_encrypter, {'clientId': client_id})
-    # e = mh_encrypter(json.dumps({'clientId': client_id}).encode())
-    # socket.send(json.dumps(e).encode())
 
-    # e = json.loads(socket.recv(1024))
-    # msg: dict = json.loads(mh_decrypter(e))
     ack = receive(socket, mh_decrypter)
     print("Received ack", ack)
 
     my_solitaire_key = generate_solitaire_key()
 
     send(socket, mh_encrypter, my_solitaire_key)
-    # e = mh_encrypter(json.dumps(my_solitaire_key).encode())
-    # socket.send(json.dumps(e).encode())
 
-    # e: list[int] = json.loads(socket.recv(2048))
-    # their_solitaire_key: dict = json.loads(mh_decrypter(e))
     their_solitaire_key: dict = receive(socket, mh_decrypter)
     print('Peer solitaire key', their_solitaire_key)
 
@@ -179,14 +163,14 @@ if __name__ == '__main__':
         server_socket.bind(('', my_port))
         server_socket.listen()
         print("Listening on port", my_port)
-        t1 = Thread(target= recv, args = (server_socket,))
-        t1.start()
+        t = Thread(target= recv_thread, args = (server_socket,))
+        t.start()
         
         command = input("Peer client_id? ")
         if peer_client_id is None:
             peer_client_id = int(command)
             peer_public_key = get_client_public_key(peer_client_id)
-            print('Public key of peer client =', peer_public_key)
+            print('Peer public key =', peer_public_key)
             mh_encrypter = PublicKeyEncrypter(peer_public_key, encrypt_mh)
         
         send_socket.connect((HOST, peer_client_id))
@@ -203,6 +187,6 @@ if __name__ == '__main__':
                 EXITED = True
                 break
 
-        t1.join()
+        t.join()
     
     
