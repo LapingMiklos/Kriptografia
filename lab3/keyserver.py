@@ -36,7 +36,7 @@ def resolve_query(client_socket: socket, public_keys: dict):
             if public_key is None:
                 send_error(msg=f'client with id={client_id} does not exist')
             else:
-                send_ok(clientId=client_id)
+                send_ok(publicKey=public_key)
         else:
             send_error(msg=f'Invalid method={method}')
     except json.JSONDecodeError:
