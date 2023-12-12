@@ -2,24 +2,20 @@ from typing import Any
 from socket import socket, AF_INET, SOCK_STREAM
 from sys import argv, path
 from threading import Thread
-from time import sleep
 import json
 from random import shuffle
 
 path.append('../lab2')
 
-from constants import HOST, KEYSERVER_PORT, SET, GET, OK
-from merkle_hellman import generate_knapsack_keypair, PublicKey, encrypt_mh, decrypt_mh
+from constants import HOST
+from merkle_hellman import generate_knapsack_keypair, encrypt_mh, decrypt_mh
 from crypto_classes import PrivateKeyDecrypter, PublicKeyEncrypter
 from generators import solitaire
 from crypto_stream import StreamEncrypter
-
-class KeyServerException(Exception):
-    pass
+from keyserver_utils import get_client_public_key, register_to_keyserver
 
 EXIT = 'bye'
 HANDSHAKE_STARTED = False
-PORT_CHOSEN = False
 EXITED = False
 
 mh_decrypter=None
@@ -32,16 +28,20 @@ def generate_solitaire_key() -> list[int]:
     shuffle(deck)
     return deck
 
+
 def combine_solitaire_keys(deck1: list[int], deck2: list[int]) -> list[int]:
     return [deck2[card - 1] for card in deck1]
+
 
 def send(socket: socket, encrypter: PublicKeyEncrypter, data: Any):
     e = encrypter(json.dumps(data).encode())
     socket.send(json.dumps(e).encode())
 
+
 def receive(socket: socket, decrypter: PrivateKeyDecrypter) -> Any:
     e = json.loads(socket.recv(2048))
     return json.loads(decrypter(e))
+
 
 def recv_thread(server_socket: socket):
     global peer_client_id
@@ -85,41 +85,6 @@ def recv_thread(server_socket: socket):
             
             if not EXITED:
                 print("> ", end="", flush=True)
-
-
-def register_to_keyserver(client_id: int, public_key: PublicKey):
-    query = {
-        'method': SET,
-        'clientId': client_id,
-        'publicKey': public_key
-    }
-
-    with socket(AF_INET, SOCK_STREAM) as keyserver_socket:
-        keyserver_socket.connect((HOST, KEYSERVER_PORT))
-        keyserver_socket.send(json.dumps(query).encode())
-        res: dict = json.loads(keyserver_socket.recv(1024))
-
-        if res.get('status') != OK:
-            raise KeyServerException
-        else:
-            print('Successfully registered public key to keyserver')
-
-
-def get_client_public_key(client_id: int) -> PublicKey:
-    query = {
-        'method': GET,
-        'clientId': client_id,
-    }
-
-    with socket(AF_INET, SOCK_STREAM) as keyserver_socket:
-        keyserver_socket.connect((HOST, KEYSERVER_PORT))
-        keyserver_socket.send(json.dumps(query).encode())
-        res: dict = json.loads(keyserver_socket.recv(1024))
-
-        if res.get('status') != OK:
-            raise KeyServerException
-        else:
-            return res.get('publicKey')
 
 
 def init_handshake(socket: socket, client_id: int):
