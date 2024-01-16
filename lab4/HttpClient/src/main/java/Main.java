@@ -30,10 +30,10 @@ public class Main {
 
             System.out.println("Verzioszam: " + certificate.getVersion());
             System.out.println("Szeriaszam: " + certificate.getSerialNumber());
-            System.out.println("Tanusito hatosag neve: " + certificate.getIssuerDN());
+            System.out.println("Tanusito hatosag neve: " + certificate.getIssuerX500Principal());
             System.out.println("Kibocsatas datuma: " + certificate.getNotBefore());
             System.out.println("Ervenyessegi ido: " + certificate.getNotAfter());
-            System.out.println("Tanusitvany alanyak adatai: " + certificate.getSubjectDN());
+            System.out.println("Tanusitvany alanyak adatai: " + certificate.getSubjectX500Principal());
             System.out.println("Nyilvanos kulcs adatai: " + certificate.getPublicKey());
 
             in.close();
@@ -41,8 +41,6 @@ public class Main {
             BufferedWriter writer = new BufferedWriter(new FileWriter("bnr.html"));
             writer.write(sb.toString());
             writer.close();
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
