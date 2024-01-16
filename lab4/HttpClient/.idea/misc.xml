@@ -5,6 +5,11 @@
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="PDMPlugin">
+    <option name="customRuleSets">
+      <list>
+        <option value="D:\Egyetem\5.Felev\IDDE\lmim2155\pmd-ruleset.xml" />
+      </list>
+    </option>
     <option name="skipTestSources" value="false" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
