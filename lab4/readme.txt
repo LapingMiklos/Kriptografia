@@ -2,8 +2,13 @@ crypto:
 1.
 	- Import bnr certificate: keytool -import -alias bnr -keystore "C:\Program Files\Java\jdk-17.0.4.1\lib\security\cacerts" -file _.bnr.ro.crt
 2.
-	- Fake Private Key: openssl genrsa -out fake.key 2048
-	- Fake certificate: openssl req -new -x509 -days 365 -key fake.key -out fake.crt
+	- FakeCA Private Key: openssl genrsa -out fakeCA.key 2048
+	- FakeCA : openssl req -new -x509 -days 365 -key fake.key -out fakeCA.crt
+	- Fake certificate key: openssl genrsa -out fake.key 2048
+	- Fake certificate CSR: openssl req -new -key fake.key -out fake.csr
+	- Sign fake certificate: openssl x509 -req -days 365 -in fake.csr -CA fakeCA.crt -CAkey fakeCA.key -set_serial <number> -out fake.crt
+	- Import fake CA: keytool -import -alias fakeCA -file fakeCA.crt -keystore fake_keystore.jks -storepass changeit
+	- Import fake certificate: 
 	- Convert crt to pem: openssl x509 -in fake.crt -out pem/fake.pem -outform PEM
 3.	
 	- RootCA Private Key: openssl ecparam -name prime256v1 -genkey -out rootCA.key
