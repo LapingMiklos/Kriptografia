@@ -10,8 +10,12 @@ import java.util.Arrays;
 
 public class Client {
     public static void main(String[] args) {
+        req("https://bnr.ro/Home-Mobile.aspx");
+    }
+
+    public static void req(String urlstr) {
         try {
-            URL url = new URL("https://bnr.ro/Home-Mobile.aspx");
+            URL url = new URL(urlstr);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
 
@@ -24,9 +28,9 @@ public class Client {
             }
 
             X509Certificate certificate = (X509Certificate) Arrays.stream(connection.getServerCertificates())
-                    .filter((e) -> e instanceof X509Certificate)
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("No valid X509certificate"));
+                .filter((e) -> e instanceof X509Certificate)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No valid X509certificate"));
 
             System.out.println("Verzioszam: " + certificate.getVersion());
             System.out.println("Szeriaszam: " + certificate.getSerialNumber());
